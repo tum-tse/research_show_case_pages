@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teaching AI to Read the City: Predicting Scooter Demand with Open Data</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f6f1;
+    --ink: #141210;
+    --mid: #4a4540;
+    --muted: #968d84;
+    --rule: #ddd8d0;
+    --teal: #0d6e6e;
+    --teal-light: #e6f4f4;
+    --amber: #c47b1a;
+    --amber-light: #fdf3e3;
+    --red: #c0392b;
+    --col1: #0d6e6e;
+    --col2: #6b3fa0;
+    --col3: #c47b1a;
+    --col4: #c0392b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Lora', serif;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  #progress {
+    position: fixed; top: 0; left: 0;
+    height: 2px; background: var(--teal);
+    width: 0%; z-index: 999;
+    transition: width 0.1s;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: var(--ink);
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-noise {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.3;
+  }
+
+  .hero-lines {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 79px,
+      rgba(255,255,255,0.03) 79px,
+      rgba(255,255,255,0.03) 80px
+    );
+  }
+
+  .hero-inner {
+    position: relative; z-index: 2;
+    padding: 4rem 5vw 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 4rem;
+  }
+
+  .hero-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 2rem; height: 1px;
+    background: var(--teal);
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.4rem, 5.5vw, 5rem);
+    font-weight: 800;
+    line-height: 1.06;
+    color: #f5f2ec;
+    max-width: 900px;
+    letter-spacing: -0.025em;
+    margin-bottom: 2rem;
+  }
+
+  .hero-title .hl { color: var(--teal); }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: rgba(245,242,236,0.55);
+    max-width: 580px;
+    line-height: 1.65;
+    margin-bottom: 3rem;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+
+  .hero-meta-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(245,242,236,0.3);
+  }
+
+  .hero-meta-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(245,242,236,0.7);
+    font-weight: 600;
+  }
+
+  .ticker {
+    position: relative; z-index: 2;
+    background: var(--teal);
+    padding: 0.7rem 5vw;
+    display: flex;
+    gap: 4rem;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .ticker::-webkit-scrollbar { display: none; }
+
+  .ticker-item {
+    white-space: nowrap;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.85);
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .ticker-item strong { color: #fff; font-size: 0.9rem; }
+
+  /* ===== LAYOUT ===== */
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 5rem 1.5rem;
+  }
+
+  .section { margin-bottom: 5rem; }
+
+  .section.fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+
+  .section.visible { opacity: 1; transform: none; }
+
+  /* ===== TYPOGRAPHY ===== */
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--teal);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .eyebrow::after {
+    content: '';
+    width: 2rem; height: 1px;
+    background: var(--teal);
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.7rem, 3.5vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 2.5rem 0 0.8rem;
+    letter-spacing: -0.01em;
+  }
+
+  p { font-size: 1rem; color: var(--mid); margin-bottom: 1.25rem; }
+
+  strong { color: var(--ink); font-weight: 500; }
+
+  mark {
+    background: var(--amber-light);
+    border-bottom: 2px solid var(--amber);
+    padding: 0 0.1em;
+    color: inherit;
+  }
+
+  /* ===== DIVIDER ===== */
+  .rule {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 4rem 0;
+    color: var(--rule);
+  }
+
+  .rule::before, .rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .rule span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+
+  /* ===== PULL QUOTE ===== */
+  .pullquote {
+    margin: 3rem 0;
+    padding: 2rem 2.5rem;
+    border-left: 3px solid var(--teal);
+    background: var(--teal-light);
+    position: relative;
+  }
+
+  .pullquote p {
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ===== CALLOUT CARDS ===== */
+  .card-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 2.5rem 0;
+  }
+
+  .card {
+    background: var(--bg);
+    padding: 1.5rem 1.25rem;
+    transition: background 0.2s;
+  }
+
+  .card:hover { background: #fff; }
+
+  .card-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--teal);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-desc {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.67rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* ===== MODEL COMPARISON ===== */
+  .model-table {
+    border: 1px solid var(--rule);
+    margin: 2.5rem 0;
+    overflow: hidden;
+  }
+
+  .model-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.2fr;
+    background: var(--ink);
+    color: rgba(255,255,255,0.5);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.7rem 1.2rem;
+    gap: 0.5rem;
+  }
+
+  .model-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.2fr;
+    padding: 1rem 1.2rem;
+    border-top: 1px solid var(--rule);
+    gap: 0.5rem;
+    align-items: center;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+
+  .model-row:hover { background: #fff; }
+
+  .model-row.winner { background: var(--teal-light); }
+
+  .model-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .model-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 0.1rem;
+  }
+
+  .model-score {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .model-score.best { color: var(--teal); font-weight: 700; }
+  .model-score.mid { color: var(--amber); }
+  .model-score.poor { color: var(--red); }
+
+  .win-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: var(--teal);
+    color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.25rem 0.6rem;
+    border-radius: 1px;
+  }
+
+  /* ===== FEATURE IMPORTANCE ===== */
+  .feat-bars { margin: 2rem 0; }
+
+  .feat-row {
+    display: grid;
+    grid-template-columns: 180px 1fr 45px;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .feat-label {
+    font-size: 0.82rem;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--mid);
+    text-align: right;
+    letter-spacing: -0.01em;
+  }
+
+  .feat-track {
+    height: 20px;
+    background: var(--rule);
+    overflow: hidden;
+    border-radius: 1px;
+  }
+
+  .feat-fill {
+    height: 100%;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 1px;
+  }
+
+  .feat-fill.animate { transform: scaleX(1); }
+  .feat-fill.ts { background: var(--teal); }
+  .feat-fill.temp { background: var(--amber); }
+  .feat-fill.soc { background: var(--col2); }
+  .feat-fill.met { background: #e8431a; }
+  .feat-fill.blt { background: var(--col4); }
+
+  .feat-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* ===== TRANSFER LEARNING VIZ ===== */
+  .transfer-viz {
+    background: var(--ink);
+    color: #f5f2ec;
+    padding: 2.5rem;
+    margin: 2.5rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .transfer-viz::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 10% 50%, rgba(13,110,110,0.2) 0%, transparent 60%);
+  }
+
+  .transfer-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(245,242,236,0.35);
+    margin-bottom: 2rem;
+    position: relative; z-index: 1;
+  }
+
+  .transfer-flow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    position: relative; z-index: 1;
+    margin-bottom: 2rem;
+  }
+
+  .city-box {
+    padding: 1.2rem 1.5rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .city-box.source { border-color: var(--teal); }
+  .city-box.target { border-color: var(--amber); }
+
+  .city-box-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+  }
+
+  .city-box.source .city-box-label { color: var(--teal); }
+  .city-box.target .city-box-label { color: var(--amber); }
+
+  .city-box-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .city-box-note {
+    font-size: 0.78rem;
+    color: rgba(245,242,236,0.4);
+    margin-top: 0.4rem;
+  }
+
+  .arrow-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 120px;
+  }
+
+  .arrow-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(245,242,236,0.4);
+    text-align: center;
+  }
+
+  .arrow-line {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal), var(--amber));
+    position: relative;
+  }
+
+  .arrow-line::after {
+    content: '▶';
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--amber);
+    font-size: 0.8rem;
+  }
+
+  .transfer-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: rgba(255,255,255,0.07);
+    position: relative; z-index: 1;
+  }
+
+  .transfer-step {
+    background: rgba(20,18,16,0.6);
+    padding: 1rem 1.2rem;
+  }
+
+  .step-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: rgba(245,242,236,0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .step-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(245,242,236,0.85);
+    margin-bottom: 0.3rem;
+  }
+
+  .step-desc {
+    font-size: 0.76rem;
+    color: rgba(245,242,236,0.4);
+    line-height: 1.4;
+    font-family: 'Lora', serif;
+  }
+
+  /* ===== IMPROVEMENT VIZ ===== */
+  .improvement-viz {
+    background: var(--teal-light);
+    border: 1px solid rgba(13,110,110,0.2);
+    padding: 2rem;
+    margin: 2.5rem 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .before-after {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .ba-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  .ba-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .ba-value.before { color: var(--red); }
+  .ba-value.after { color: var(--teal); }
+
+  .ba-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .improvement-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .imp-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--teal);
+    line-height: 1;
+  }
+
+  .imp-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--teal);
+    text-align: center;
+  }
+
+  /* ===== INSIGHT BOXES ===== */
+  .insight {
+    display: flex;
+    gap: 1.2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--rule);
+    margin-bottom: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+
+  .insight:hover {
+    border-color: var(--teal);
+    box-shadow: 3px 3px 0 var(--teal-light);
+  }
+
+  .insight-icon { font-size: 1.5rem; flex-shrink: 0; line-height: 1; }
+
+  .insight h4 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.01em;
+  }
+
+  .insight p {
+    font-size: 0.82rem;
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ===== CTA ===== */
+  .cta {
+    background: var(--ink);
+    color: #f5f2ec;
+    padding: 4rem 2.5rem;
+    margin: 4rem -1.5rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta::after {
+    content: 'AI';
+    position: absolute;
+    font-family: 'Syne', sans-serif;
+    font-size: 18rem;
+    font-weight: 800;
+    opacity: 0.04;
+    right: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 1;
+    color: var(--teal);
+  }
+
+  .cta h2 { color: #f5f2ec; position: relative; z-index: 1; }
+
+  .cta p {
+    color: rgba(245,242,236,0.5);
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    position: relative; z-index: 1;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    padding: 0.8rem 2.2rem;
+    background: var(--teal);
+    color: #fff;
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    position: relative; z-index: 1;
+  }
+
+  .cta-btn:hover { background: #fff; color: var(--ink); }
+
+  .citation {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+    line-height: 1.8;
+    letter-spacing: 0.03em;
+  }
+
+  [data-tip] {
+    border-bottom: 1px dashed var(--muted);
+    cursor: help;
+    position: relative;
+  }
+
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 120%; left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: #f5f2ec;
+    padding: 0.4rem 0.7rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  @media (max-width: 640px) {
+    .hero-inner { padding: 2rem 1.5rem 2.5rem; }
+    .hero-title { font-size: 2.2rem; }
+    .model-header, .model-row { grid-template-columns: 1.5fr 1fr 1fr; }
+    .model-header > :last-child, .model-row > :last-child { display: none; }
+    .feat-row { grid-template-columns: 130px 1fr 40px; }
+    .feat-label { font-size: 0.72rem; }
+    .improvement-viz { grid-template-columns: 1fr; gap: 1rem; }
+    .transfer-flow { flex-direction: column; }
+    .cta { padding: 2.5rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-noise"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Machine Learning · Urban Mobility · Open Data · 2023</div>
+    <h1 class="hero-title">Teaching One City's AI to <span class="hl">Predict Another City's</span> Scooters</h1>
+    <p class="hero-sub">What if you could forecast e-scooter demand in a city you've never seen before — using only free, publicly available data? Researchers from TU Munich just showed it's possible.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Authors</span>
+        <span class="hero-meta-val">Abouelela, Lyu & Antoniou</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Journal</span>
+        <span class="hero-meta-val">Data Science for Transportation, 2023</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Best Model</span>
+        <span class="hero-meta-val">LightGBM (+15.9% accuracy)</span>
+      </div>
+    </div>
+  </div>
+  <div class="ticker">
+    <div class="ticker-item"><strong>7M+</strong> trips analyzed in Austin</div>
+    <div class="ticker-item"><strong>390K</strong> trips in Louisville</div>
+    <div class="ticker-item"><strong>4</strong> ML models compared</div>
+    <div class="ticker-item"><strong>67%</strong> of prediction power from time-series</div>
+    <div class="ticker-item"><strong>15.9%</strong> error reduction with transfer learning</div>
+    <div class="ticker-item"><strong>100%</strong> open-source data</div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="page">
+
+  <!-- INTRO -->
+  <section class="section fade-in">
+    <div class="eyebrow">The Problem</div>
+    <h2>Scooters Arrived Without a Manual. Here's the Operating Guide.</h2>
+    <p>Shared e-scooters are notoriously hard to run efficiently. Operators deploy a fixed number of vehicles and hope for the best — even though demand swings wildly by season, day of week, weather, and local events. Too many scooters clog sidewalks; too few mean missed revenue and unhappy riders.</p>
+    <p>The challenge is especially acute for <strong>new deployments</strong>: a city launching scooters has no historical data of its own. This paper tackles that problem directly by asking: <mark>can we train a machine learning model on one city's data and use it to predict demand in another?</mark></p>
+    <p>The answer, using Austin (source) and Louisville (target), is yes — with the right techniques.</p>
+  </section>
+
+  <div class="card-row section fade-in">
+    <div class="card">
+      <div class="card-num">7M+</div>
+      <div class="card-desc">Austin trips, Apr 2018–Jan 2020</div>
+    </div>
+    <div class="card">
+      <div class="card-num">390K</div>
+      <div class="card-desc">Louisville trips, Aug 2018–Jan 2020</div>
+    </div>
+    <div class="card">
+      <div class="card-num">4</div>
+      <div class="card-desc">ML models tested head-to-head</div>
+    </div>
+    <div class="card">
+      <div class="card-num">100%</div>
+      <div class="card-desc">Open-source data sources used</div>
+    </div>
+  </div>
+
+  <div class="rule"><span>What They Built</span></div>
+
+  <!-- THE APPROACH -->
+  <section class="section fade-in">
+    <div class="eyebrow">The Framework</div>
+    <h2>From Raw Data to Daily Fleet Predictions</h2>
+    <p>The researchers built a pipeline that takes four types of freely available data — scooter trips, weather, census demographics, and built environment info from OpenStreetMap — and combines them to predict the single most operationally useful number: <strong>trips per vehicle per day</strong> (fleet utilization).</p>
+    <p>Predicting utilization rate (rather than raw trip count) is smart design. It controls for fleet size differences between cities, avoids the supply-demand chicken-and-egg problem, and directly informs how many vehicles to deploy on any given day.</p>
+
+    <div class="transfer-viz section fade-in">
+      <div class="transfer-title">Model Transfer Pipeline — Austin → Louisville</div>
+      <div class="transfer-flow">
+        <div class="city-box source">
+          <div class="city-box-label">Source City</div>
+          <div class="city-box-name">Austin, TX</div>
+          <div class="city-box-note">Long-term data · 21 months · 15,000 max fleet</div>
+        </div>
+        <div class="arrow-box">
+          <div class="arrow-label">Train model +<br>Transfer learning</div>
+          <div class="arrow-line"></div>
+        </div>
+        <div class="city-box target">
+          <div class="city-box-label">Target City</div>
+          <div class="city-box-name">Louisville, KY</div>
+          <div class="city-box-note">Short pilot data · 3 months · 1,200 max fleet</div>
+        </div>
+      </div>
+      <div class="transfer-steps">
+        <div class="transfer-step">
+          <div class="step-num">Step 01</div>
+          <div class="step-name">Feature Engineering</div>
+          <div class="step-desc">Extract time-series features: recent demand, weekly patterns, trend differences</div>
+        </div>
+        <div class="transfer-step">
+          <div class="step-num">Step 02</div>
+          <div class="step-name">Sample Normalization</div>
+          <div class="step-desc">Rescale each time window to mean=0, std=1 to bridge the gap between cities</div>
+        </div>
+        <div class="transfer-step">
+          <div class="step-num">Step 03</div>
+          <div class="step-name">Label Differencing</div>
+          <div class="step-desc">Remove trend from demand data so the model predicts changes, not absolute levels</div>
+        </div>
+        <div class="transfer-step">
+          <div class="step-num">Step 04</div>
+          <div class="step-name">Predict Louisville</div>
+          <div class="step-desc">Apply the Austin-trained model to Louisville's pilot data and evaluate accuracy</div>
+        </div>
+      </div>
+    </div>
+
+    <p>The key technical challenge is called <span data-tip="When training and test data have different distributions">covariate shift</span>: Austin and Louisville have different demand scales, fleet sizes, and rider populations. A model trained on Austin data would naively underestimate Louisville's higher utilization rates. The two-step fix — sample normalization plus label differencing — elegantly aligns the distributions without needing to retrain.</p>
+  </section>
+
+  <div class="rule"><span>The Models</span></div>
+
+  <!-- MODEL COMPARISON -->
+  <section class="section fade-in">
+    <div class="eyebrow">Head-to-Head</div>
+    <h2>Four Algorithms Walk Into Louisville. One Wins.</h2>
+    <p>Four machine learning models were tested, ranging from classical statistics to cutting-edge deep learning. The results challenge a common assumption: <mark>more complexity doesn't always win</mark>.</p>
+
+    <div class="model-table">
+      <div class="model-header">
+        <div>Model</div>
+        <div>Test RMSE</div>
+        <div>Test MAE</div>
+        <div>Verdict</div>
+      </div>
+
+      <div class="model-row winner">
+        <div>
+          <div class="model-name">LightGBM</div>
+          <div class="model-tag">Gradient Boosting · Decision Trees</div>
+        </div>
+        <div class="model-score best">1845.6</div>
+        <div class="model-score best">346.8</div>
+        <div><span class="win-badge">🏆 Winner</span></div>
+      </div>
+
+      <div class="model-row">
+        <div>
+          <div class="model-name">Linear Regression</div>
+          <div class="model-tag">Classical Statistics · Fast</div>
+        </div>
+        <div class="model-score mid">2054.4</div>
+        <div class="model-score mid">381.2</div>
+        <div><span style="font-family:IBM Plex Mono,monospace;font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Runner-up</span></div>
+      </div>
+
+      <div class="model-row">
+        <div>
+          <div class="model-name">SVR</div>
+          <div class="model-tag">Support Vector · Kernel Methods</div>
+        </div>
+        <div class="model-score mid">2208.3</div>
+        <div class="model-score mid">371.3</div>
+        <div><span style="font-family:IBM Plex Mono,monospace;font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Inconsistent</span></div>
+      </div>
+
+      <div class="model-row">
+        <div>
+          <div class="model-name">LSTM Neural Net</div>
+          <div class="model-tag">Deep Learning · Sequential</div>
+        </div>
+        <div class="model-score poor">2376.0</div>
+        <div class="model-score poor">436.4</div>
+        <div><span style="font-family:IBM Plex Mono,monospace;font-size:0.62rem;color:var(--red);text-transform:uppercase;letter-spacing:0.08em;">Worst</span></div>
+      </div>
+    </div>
+
+    <p>LSTM — the deep learning champion often used for time-series prediction — came in last. The authors explain: for tabular data with mixed static and dynamic features, decision-tree-based models like LightGBM consistently outperform neural networks. <strong>This is a well-known pattern in data science competitions</strong>, but worth emphasizing for practitioners excited about deep learning.</p>
+
+    <div class="improvement-viz section fade-in">
+      <div class="before-after">
+        <div>
+          <div class="ba-label">Without Transfer Learning</div>
+          <div class="ba-value before">2195.7</div>
+          <div class="ba-sub">RMSE (×10⁻⁵)</div>
+        </div>
+        <div>
+          <div class="ba-label">With Transfer Learning</div>
+          <div class="ba-value after">1845.6</div>
+          <div class="ba-sub">RMSE (×10⁻⁵)</div>
+        </div>
+      </div>
+      <div class="improvement-arrow">
+        <div class="imp-pct">−15.9%</div>
+        <div class="imp-label">Error reduction<br>with sample normalization<br>+ label differencing</div>
+      </div>
+    </div>
+
+    <p>Neither transfer strategy alone was enough. Label differencing without normalization didn't help; normalization without differencing didn't help either. <strong>Only combining both reduced the cross-city generalization error</strong> — by 15.9% on the best model.</p>
+  </section>
+
+  <div class="rule"><span>What Drives the Prediction</span></div>
+
+  <!-- FEATURE IMPORTANCE -->
+  <section class="section fade-in">
+    <div class="eyebrow">Feature Importance</div>
+    <h2>Yesterday's Demand Is the Best Predictor of Tomorrow's.</h2>
+    <p>The LightGBM model ranks its features by how often it splits on them. The results confirm intuition — but also reveal some surprises about what <em>doesn't</em> matter as much as you'd think.</p>
+
+    <div class="feat-bars" id="featBars">
+      <div class="feat-row">
+        <div class="feat-label">Time Series Features</div>
+        <div class="feat-track"><div class="feat-fill ts" data-w="1"></div></div>
+        <div class="feat-val">67%</div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-label">Temporal (Day/Season)</div>
+        <div class="feat-track"><div class="feat-fill temp" data-w="0.146"></div></div>
+        <div class="feat-val">9.8%</div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-label">Sociodemographics</div>
+        <div class="feat-track"><div class="feat-fill soc" data-w="0.143"></div></div>
+        <div class="feat-val">9.6%</div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-label">Meteorological</div>
+        <div class="feat-track"><div class="feat-fill met" data-w="0.106"></div></div>
+        <div class="feat-val">7.1%</div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-label">Built Environment</div>
+        <div class="feat-track"><div class="feat-fill blt" data-w="0.099"></div></div>
+        <div class="feat-val">6.6%</div>
+      </div>
+    </div>
+
+    <p>The dominance of time-series features (67%) reflects a fundamental property of urban mobility: tomorrow looks a lot like today, and a lot like last week. The top individual predictor is <strong>yesterday's demand</strong> (6.6%), followed by <strong>elapsed days since service launch</strong> (6.3%) — a proxy for the service maturity effect where early users behave differently than regular users.</p>
+
+    <div class="pullquote">
+      <p>Removing time-series features caused a 43% jump in prediction error. Removing built environment or sociodemographic features each caused less than 2% degradation — yet both still matter for spatial prediction accuracy.</p>
+    </div>
+
+    <p>The practical takeaway: you don't need a massive feature set to build a working demand predictor. <mark>You need the last 30 days of trips, the temperature forecast, and basic census data.</mark> All of it is free.</p>
+  </section>
+
+  <div class="rule"><span>Spatial Patterns</span></div>
+
+  <!-- SPATIAL -->
+  <section class="section fade-in">
+    <div class="eyebrow">Space & Time</div>
+    <h2>Downtown Belongs to Weekends. Campuses Own Weekdays.</h2>
+    <p>Both Austin and Louisville exhibit the same spatial split that the companion study of five cities found. University areas — UT Austin, University of Louisville — dominate weekday demand at all hours. Downtown entertainment districts flip to dominate on weekends and early mornings.</p>
+    <p>The models' spatial error analysis reveals something important: <strong>prediction errors concentrate around downtown and university zones</strong>. These high-demand areas are also where the model understimates peaks — because they're also where unpredictable events (festivals, games, concerts) spike demand beyond what historical patterns suggest.</p>
+
+    <div class="insight">
+      <div class="insight-icon">🗺️</div>
+      <div>
+        <h4>Different Urban Structures, Same Spatial Logic</h4>
+        <p>Austin and Louisville have completely different city layouts and sizes — yet their scooter demand is spatially concentrated in the same types of zones (educational and entertainment hubs). This suggests the framework can generalize broadly.</p>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">🌡️</div>
+      <div>
+        <h4>Seasonal Synchrony Across Cities</h4>
+        <p>Both cities show demand increasing through spring and summer, dropping from October, and hitting lows in January — despite different climates. The scaled demand trends are nearly identical once fleet size differences are controlled.</p>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">📉</div>
+      <div>
+        <h4>Under One Trip Per Vehicle Per Day — and That's a Problem</h4>
+        <p>The median fleet utilization in both cities is below 1 trip/vehicle/day. Most scooters sit idle most of the time. The authors argue fleet sizes should be dynamically adjusted — ideally daily — to match predicted demand, not held constant.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"><span>For Cities & Operators</span></div>
+
+  <!-- POLICY -->
+  <section class="section fade-in">
+    <div class="eyebrow">Policy Implications</div>
+    <h2>A Practical Tool, Not Just a Research Exercise</h2>
+    <p>The paper is explicit about practical applicability. The entire methodology uses <strong>publicly available data sources</strong> that any city or operator can access: open city trip portals, census.gov, openstreetmap.org, and visualcrossing.com. No proprietary data required.</p>
+
+    <div class="insight">
+      <div class="insight-icon">🚀</div>
+      <div>
+        <h4>Deploy New Cities Without Historical Data</h4>
+        <p>The transfer learning approach means a city launching scooters for the first time can borrow demand patterns from a similar city. Only ~3 months of pilot data is needed in the target city before the model adapts.</p>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">📅</div>
+      <div>
+        <h4>Dynamic Fleet Sizing by Season and Forecast</h4>
+        <p>Instead of deploying a fixed 1,200 or 15,000 scooters year-round, operators can use daily utilization predictions to right-size fleets. Fewer idle scooters means less sidewalk clutter, lower redistribution costs, and improved sustainability metrics.</p>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">🎉</div>
+      <div>
+        <h4>Special Events Need Special Planning</h4>
+        <p>Austin's SXSW festival drove 5–6× normal demand — an extreme outlier the model struggled with. Event calendars should be integrated as explicit features in future model versions, with dedicated redistribution protocols.</p>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">📖</div>
+      <div>
+        <h4>Open Data Publication Is a Policy Tool</h4>
+        <p>The study would be impossible without cities publishing trip data. The authors explicitly call for more cities to follow suit — not just for research, but because transparency creates accountability and improves service quality.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta section fade-in">
+    <h2>The Full Technical Story</h2>
+    <p>The paper contains the complete model specifications, all coefficient tables, spatial error maps, and full feature engineering procedures. Everything reproducible with open data.</p>
+    <a href="https://doi.org/10.1007/s42421-023-00068-9" class="cta-btn" target="_blank">Read the Full Paper →</a>
+  </div>
+
+  <div class="citation section fade-in">
+    Abouelela, M., Lyu, C., & Antoniou, C. (2023). Exploring the potentials of open-source big data and machine learning in shared mobility fleet utilization prediction. <em>Data Science for Transportation</em>, 5, 5. https://doi.org/10.1007/s42421-023-00068-9
+  </div>
+
+</main>
+
+<script>
+// PROGRESS BAR
+window.addEventListener('scroll', () => {
+  const s = window.scrollY;
+  const t = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('progress').style.width = (s / t * 100) + '%';
+});
+
+// INTERSECTION OBSERVER
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // Animate feat bars
+      e.target.querySelectorAll('.feat-fill').forEach((b, i) => {
+        setTimeout(() => {
+          b.style.transform = `scaleX(${b.dataset.w})`;
+          b.classList.add('animate');
+        }, i * 100);
+      });
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.section.fade-in').forEach(s => {
+  obs.observe(s);
+});
+
+// Init feat bars to 0
+document.querySelectorAll('.feat-fill').forEach(b => {
+  b.style.transform = 'scaleX(0)';
+});
+</script>
+</body>
+</html>
