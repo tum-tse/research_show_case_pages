@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The E-Scooter Landscape: 9 Million Trips Decoded</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0e0c;
+    --cream: #f5f0e8;
+    --warm-white: #faf8f4;
+    --accent: #e8431a;
+    --accent2: #2d6a4f;
+    --muted: #7a7570;
+    --border: #d6cfc4;
+    --highlight: #ffd166;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--warm-white);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* PROGRESS BAR */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--accent);
+    width: 0%;
+    z-index: 1000;
+    transition: width 0.1s linear;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .header-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 20% 50%, rgba(232,67,26,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(45,106,79,0.12) 0%, transparent 50%),
+      var(--ink);
+  }
+
+  .header-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(245,240,232,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,240,232,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .header-kicker {
+    position: relative;
+    z-index: 2;
+    padding: 3rem 4rem 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-kicker::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .scooter-hero {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: clamp(8rem, 20vw, 22rem);
+    opacity: 0.06;
+    line-height: 1;
+    animation: float 6s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(-50%) rotate(-5deg); }
+    50% { transform: translateY(calc(-50% - 20px)) rotate(5deg); }
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem 4rem 5rem;
+    max-width: 900px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .header-deck {
+    font-size: 1.15rem;
+    color: rgba(245,240,232,0.7);
+    max-width: 600px;
+    margin-bottom: 3rem;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .meta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .meta-value {
+    font-size: 0.9rem;
+    color: var(--cream);
+    font-weight: 400;
+  }
+
+  .stat-band {
+    background: var(--accent);
+    padding: 0.6rem 4rem;
+    display: flex;
+    gap: 4rem;
+    overflow-x: auto;
+  }
+
+  .stat-pill {
+    white-space: nowrap;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+  }
+
+  .stat-pill strong {
+    font-size: 1rem;
+  }
+
+  /* MAIN LAYOUT */
+  main {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+  }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 5rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 50px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  p {
+    font-size: 1.05rem;
+    color: #2a2520;
+    margin-bottom: 1.3rem;
+  }
+
+  /* PULL QUOTE */
+  .pull-quote {
+    border-left: 4px solid var(--accent);
+    padding: 1.5rem 2rem;
+    margin: 3rem 0;
+    background: var(--cream);
+    position: relative;
+  }
+
+  .pull-quote::before {
+    content: '"';
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: var(--accent);
+    opacity: 0.2;
+    position: absolute;
+    top: -1rem;
+    left: 1rem;
+    line-height: 1;
+  }
+
+  .pull-quote p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* STAT CARDS */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  .stat-card {
+    background: var(--warm-white);
+    padding: 1.8rem 1.5rem;
+    transition: background 0.2s;
+  }
+
+  .stat-card:hover { background: var(--cream); }
+
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.4;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  /* INTERACTIVE CHART */
+  .chart-container {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    margin: 2.5rem 0;
+    border-radius: 2px;
+  }
+
+  .chart-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 50px;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .bar-label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-align: right;
+    color: var(--ink);
+  }
+
+  .bar-track {
+    background: var(--border);
+    height: 24px;
+    border-radius: 1px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: var(--ink);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+
+  .bar-fill.animate { transform: scaleX(1); }
+
+  .bar-fill.accent { background: var(--accent); }
+  .bar-fill.green { background: var(--accent2); }
+
+  .bar-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .bar-row:hover .bar-fill { filter: brightness(1.1); }
+
+  /* CITY TABS */
+  .tabs-container {
+    margin: 2.5rem 0;
+    border: 1px solid var(--border);
+  }
+
+  .tabs-nav {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--cream);
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 0.8rem 1.2rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: var(--warm-white);
+  }
+
+  .tab-btn:hover { color: var(--ink); }
+
+  .tab-panel {
+    display: none;
+    padding: 1.8rem 2rem;
+  }
+
+  .tab-panel.active { display: block; }
+
+  .city-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .city-stat {
+    text-align: center;
+  }
+
+  .city-stat .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--ink);
+    display: block;
+  }
+
+  .city-stat .lbl {
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+
+  .city-note {
+    font-size: 0.9rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    margin-top: 1rem;
+    font-style: italic;
+  }
+
+  /* FINDING BOXES */
+  .finding-box {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.8rem;
+    border: 1px solid var(--border);
+    margin: 1.5rem 0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+
+  .finding-box:hover {
+    border-color: var(--accent);
+    box-shadow: 4px 4px 0 var(--accent);
+  }
+
+  .finding-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .finding-content h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0;
+  }
+
+  .finding-content p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* DEMAND PATTERN VISUALIZATION */
+  .demand-viz {
+    background: var(--ink);
+    padding: 2rem;
+    margin: 2.5rem 0;
+    color: var(--cream);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .demand-viz::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(232,67,26,0.1) 0%, transparent 60%);
+  }
+
+  .demand-viz-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(245,240,232,0.5);
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hour-grid {
+    display: grid;
+    grid-template-columns: repeat(24, 1fr);
+    gap: 3px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 0.8rem;
+  }
+
+  .hour-bar {
+    border-radius: 1px 1px 0 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .hour-bar:hover { opacity: 0.7; }
+
+  .hour-bar::after {
+    content: attr(data-hour);
+    position: absolute;
+    bottom: -1.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    color: rgba(245,240,232,0.3);
+    white-space: nowrap;
+  }
+
+  .hour-labels {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: rgba(245,240,232,0.3);
+  }
+
+  .day-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .day-btn {
+    padding: 0.3rem 0.8rem;
+    border: 1px solid rgba(245,240,232,0.2);
+    background: none;
+    color: rgba(245,240,232,0.5);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .day-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--cream);
+  }
+
+  .peak-label {
+    position: absolute;
+    top: -1.5rem;
+    background: var(--accent);
+    color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    padding: 0.1rem 0.4rem;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+  }
+
+  /* FACTORS GRID */
+  .factors-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .factor-card {
+    padding: 1.3rem;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+
+  .factor-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+
+  .factor-card.positive::before { background: var(--accent2); }
+  .factor-card.negative::before { background: var(--accent); }
+  .factor-card.mixed::before { background: var(--highlight); }
+
+  .factor-card:hover { background: var(--cream); }
+
+  .factor-direction {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .factor-direction.pos { color: var(--accent2); }
+  .factor-direction.neg { color: var(--accent); }
+  .factor-direction.mix { color: #b08a00; }
+
+  .factor-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .factor-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 4rem 0;
+    color: var(--border);
+  }
+
+  .section-divider::before,
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-divider span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* HIGHLIGHT TEXT */
+  mark {
+    background: var(--highlight);
+    padding: 0 0.15em;
+  }
+
+  /* CTA */
+  .cta-section {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 4rem;
+    margin: 4rem -2rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '🛴';
+    position: absolute;
+    font-size: 15rem;
+    opacity: 0.05;
+    left: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .cta-section h2 {
+    color: var(--cream);
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-section p {
+    color: rgba(245,240,232,0.6);
+    position: relative;
+    z-index: 1;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    padding: 0.9rem 2.5rem;
+    background: var(--accent);
+    color: var(--cream);
+    text-decoration: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-btn:hover {
+    background: var(--cream);
+    color: var(--ink);
+  }
+
+  .citation {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    line-height: 1.7;
+  }
+
+  /* TOOLTIP */
+  [data-tip] { position: relative; cursor: help; border-bottom: 1px dashed var(--muted); }
+
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--cream);
+    padding: 0.4rem 0.7rem;
+    font-size: 0.72rem;
+    white-space: nowrap;
+    z-index: 100;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    pointer-events: none;
+  }
+
+  @media (max-width: 640px) {
+    header { min-height: auto; }
+    .header-content, .header-kicker { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .stat-band { padding-left: 1.5rem; }
+    main { padding: 3rem 1.2rem; }
+    .city-stats { grid-template-columns: repeat(2, 1fr); }
+    .factors-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 2.4rem; }
+    .cta-section { padding: 2.5rem 1.5rem; margin-left: -1.2rem; margin-right: -1.2rem; }
+    .hour-bar::after { display: none; }
+    .bar-row { grid-template-columns: 80px 1fr 40px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header>
+  <div class="header-bg"></div>
+  <div class="header-grid"></div>
+  <div class="scooter-hero">🛴</div>
+  <div class="header-kicker">Research Decoded · Urban Mobility · 2023</div>
+  <div class="header-content">
+    <h1>9 Million Rides.<br><em>One Pattern</em><br>Every City.</h1>
+    <p class="header-deck">A landmark study tracked e-scooter trips across five North American cities — and found something surprising: the way we ride is remarkably, stubbornly similar no matter where we live.</p>
+    <div class="header-meta">
+      <div class="meta-item">
+        <span class="meta-label">Authors</span>
+        <span class="meta-value">Abouelela, Chaniotakis & Antoniou</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Published</span>
+        <span class="meta-value">Transportation Research Part A, 2023</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Institution</span>
+        <span class="meta-value">TU Munich · UCL London</span>
+      </div>
+    </div>
+  </div>
+  <div class="stat-band">
+    <div class="stat-pill"><strong>~9M</strong> trips analyzed</div>
+    <div class="stat-pill"><strong>5</strong> North American cities</div>
+    <div class="stat-pill"><strong>1.7 km</strong> avg trip distance</div>
+    <div class="stat-pill"><strong>11 min</strong> avg trip duration</div>
+    <div class="stat-pill"><strong>10 km/h</strong> avg speed</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- INTRO -->
+  <div class="section">
+    <div class="section-label">The Big Picture</div>
+    <h2>Scooters Arrived and Cities Scrambled. Now We Have the Data.</h2>
+    <p>When Lime launched the world's first shared scooter service in Santa Monica in July 2017, cities had no idea what was coming. By 2019, <mark>88.5 million scooter trips</mark> were completed in the US alone — a 130% increase in a single year. Regulators, planners, and operators were flying blind.</p>
+    <p>This study changes that. By analyzing approximately nine million trips across Austin, Calgary, Chicago, Louisville, and Minneapolis — covering everything from weather's effect on ridership to which neighborhoods people scoot through — researchers at TU Munich and UCL have built the most comprehensive cross-city picture of e-scooter use to date.</p>
+  </div>
+
+  <div class="stat-grid section">
+    <div class="stat-card">
+      <div class="stat-number">38.5M</div>
+      <div class="stat-desc">scooter trips in USA by end of 2018</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">45.8%</div>
+      <div class="stat-desc">of all micromobility trips were scooters in 2018</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">109</div>
+      <div class="stat-desc">US cities with scooters by 2019</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">$500B</div>
+      <div class="stat-desc">projected micromobility market by 2030</div>
+    </div>
+  </div>
+
+  <div class="section-divider"><span>The Cities</span></div>
+
+  <!-- CITY PROFILES -->
+  <div class="section">
+    <div class="section-label">City Profiles</div>
+    <h2>Five Cities, Wildly Different — Yet Strangely Alike</h2>
+    <p>The researchers chose cities deliberately distinct in size, climate, and transit infrastructure. Chicago has 2.7 million people and world-class public transit; Louisville has 620,000 and a transit share of just 4%. Yet once scooters hit the streets, the patterns converged.</p>
+
+    <div class="tabs-container">
+      <div class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('austin', this)">Austin, TX</button>
+        <button class="tab-btn" onclick="switchTab('calgary', this)">Calgary, AB</button>
+        <button class="tab-btn" onclick="switchTab('chicago', this)">Chicago, IL</button>
+        <button class="tab-btn" onclick="switchTab('louisville', this)">Louisville, KY</button>
+        <button class="tab-btn" onclick="switchTab('minneapolis', this)">Minneapolis, MN</button>
+      </div>
+
+      <div id="tab-austin" class="tab-panel active">
+        <div class="city-stats">
+          <div class="city-stat"><span class="num">950K</span><span class="lbl">Population</span></div>
+          <div class="city-stat"><span class="num">10</span><span class="lbl">Operators</span></div>
+          <div class="city-stat"><span class="num">15,000</span><span class="lbl">Vehicles</span></div>
+        </div>
+        <p class="city-note">Austin is the longest-running dataset, spanning April 2018 to January 2020. It hosted the SXSW music festival in March 2019, which sent daily demand to <strong>4× the normal rate</strong> — nearly 39,000 trips in a single day. Scooters are permitted on both bike lanes and sidewalks.</p>
+      </div>
+      <div id="tab-calgary" class="tab-panel">
+        <div class="city-stats">
+          <div class="city-stat"><span class="num">1.34M</span><span class="lbl">Population</span></div>
+          <div class="city-stat"><span class="num">3</span><span class="lbl">Operators</span></div>
+          <div class="city-stat"><span class="num">1,500</span><span class="lbl">Vehicles</span></div>
+        </div>
+        <p class="city-note">Calgary achieved the highest fleet utilization of any city in the study — <strong>~4 trips per vehicle per day</strong>, compared to 1–2 elsewhere. Its 16-month pilot (July–Sep 2019 data published) shows what sustained deployment looks like. Downtown concentration on weekdays is unique, explained by multiple university campuses in the core.</p>
+      </div>
+      <div id="tab-chicago" class="tab-panel">
+        <div class="city-stats">
+          <div class="city-stat"><span class="num">2.71M</span><span class="lbl">Population</span></div>
+          <div class="city-stat"><span class="num">10</span><span class="lbl">Operators</span></div>
+          <div class="city-stat"><span class="num">2,500</span><span class="lbl">Vehicles</span></div>
+        </div>
+        <p class="city-note">Chicago has the <strong>fastest average trip speed</strong> (12 km/h vs ~9.5–10 elsewhere), and was the only city to restrict scooter use between 10pm–5am. Its transit share for work trips (28%) is nearly 6× the US average. The pilot ran June–October 2019, with declining demand as severe winter weather set in.</p>
+      </div>
+      <div id="tab-louisville" class="tab-panel">
+        <div class="city-stats">
+          <div class="city-stat"><span class="num">620K</span><span class="lbl">Population</span></div>
+          <div class="city-stat"><span class="num">4</span><span class="lbl">Operators</span></div>
+          <div class="city-stat"><span class="num">1,200</span><span class="lbl">Vehicles</span></div>
+        </div>
+        <p class="city-note">Louisville has the <strong>longest trip durations</strong> — likely because pricing was lower ($1 unlock + $0.15/min vs $0.33/min elsewhere). It's the only city requiring helmets. Demand patterns show a notable shift between the pilot phase and regular use: the peak hour moved from 4pm to 1pm post-pilot.</p>
+      </div>
+      <div id="tab-minneapolis" class="tab-panel">
+        <div class="city-stats">
+          <div class="city-stat"><span class="num">3.63M</span><span class="lbl">Population (Metro)</span></div>
+          <div class="city-stat"><span class="num">4</span><span class="lbl">Operators</span></div>
+          <div class="city-stat"><span class="num">2,000</span><span class="lbl">Vehicles</span></div>
+        </div>
+        <p class="city-note">Minneapolis showed an unusual demand spike in November — doubling despite cold weather — before its pilot ended in December 2018. Uniquely, <strong>Thursday</strong> (not Friday or Saturday) showed the highest average demand. Weekend and weekday patterns were nearly indistinguishable, possibly due to coarse time-rounding in the data.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"><span>When People Ride</span></div>
+
+  <!-- DEMAND PATTERNS -->
+  <div class="section">
+    <div class="section-label">Temporal Demand</div>
+    <h2>Work Trips in the Morning. Bars on Saturday Night.</h2>
+    <p>One of the study's most striking findings: demand patterns are almost identical across all five cities, despite their differences. The <data-tip="Hourly demand expressed as a % of daily total">normalized hourly demand</data-tip> peaks between 8–12% in almost every city. The shape of the day is consistent — and it tells a clear story about why people ride.</p>
+
+    <div class="demand-viz">
+      <div class="demand-viz-title">Average Hourly Demand — % of Daily Total</div>
+      <div class="day-toggle">
+        <button class="day-btn active" onclick="switchDay('weekday', this)">Weekday</button>
+        <button class="day-btn" onclick="switchDay('weekend', this)">Weekend</button>
+      </div>
+      <div class="hour-grid" id="hourGrid"></div>
+      <div class="hour-labels">
+        <span>Midnight</span><span>6am</span><span>Noon</span><span>6pm</span><span>11pm</span>
+      </div>
+    </div>
+
+    <div class="finding-box section">
+      <div class="finding-icon">🌅</div>
+      <div class="finding-content">
+        <h4>Morning Minor Peak (8–10am)</h4>
+        <p>Cities with higher public transit use (Chicago: 28% work trips by transit; Calgary: 16%) show a clearer morning commute peak. Scooters serve as a first/last-mile solution, connecting riders to train and bus stops.</p>
+      </div>
+    </div>
+    <div class="finding-box section">
+      <div class="finding-icon">🍺</div>
+      <div class="finding-content">
+        <h4>Weekend: One Peak, Later in the Day</h4>
+        <p>On weekends, the bimodal pattern collapses to a single afternoon peak, and early morning (post-midnight) use increases sharply. Spatial data confirms: demand clusters around bars, restaurants, and parks — not offices.</p>
+      </div>
+    </div>
+    <div class="finding-box section">
+      <div class="finding-icon">🎸</div>
+      <div class="finding-content">
+        <h4>Events 4× Normal Demand</h4>
+        <p>During Austin's SXSW festival, daily scooter trips hit ~39,000 — nearly four times the average. Similar spikes appeared in Washington DC during the Cherry Blossom Festival. Operators need event-aware fleet deployment.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"><span>Where People Ride</span></div>
+
+  <!-- SPATIAL PATTERNS -->
+  <div class="section">
+    <div class="section-label">Spatial Demand</div>
+    <h2>Campus on Tuesday. Downtown on Saturday.</h2>
+    <p>The spatial story reinforces the temporal one. On weekdays, demand concentrates near <mark>universities and educational institutions</mark>. On weekends, it migrates to downtown entertainment districts, parks, and waterfronts.</p>
+
+    <div class="pull-quote">
+      <p>In all five cities studied, scooter demand shifts from educational clusters on weekdays to leisure and nightlife districts on weekends — a pattern that held regardless of city size or climate.</p>
+    </div>
+
+    <p>The University of Texas campus in Austin, the University of Minnesota in Minneapolis, and the University of Louisville all generate high weekday demand. Meanwhile, Baxter Avenue (Louisville's restaurant strip), Wicker Park (Chicago), and the area around Lake Calhoun (Minneapolis) dominate weekends.</p>
+    <p>Calgary is the exception: because multiple university campuses are in the downtown core, the weekday/weekend spatial contrast is less pronounced. The logic is the same — it's just that education and entertainment share the same geography.</p>
+
+    <h3>Demand Changes Over Time</h3>
+    <p>Comparing Austin's pilot period to its regular-use phase reveals something important: early users traveled further, faster, and more broadly. With time, trips became <mark>shorter, slower, and more geographically concentrated</mark>. Researchers suggest this reflects the "novelty factor" — early adopters exploring the service — giving way to habitual, purposeful commuting behavior.</p>
+  </div>
+
+  <div class="section-divider"><span>What Drives Demand</span></div>
+
+  <!-- FACTORS -->
+  <div class="section">
+    <div class="section-label">Demand Factors</div>
+    <h2>Weather Kills Demand. Transit Access Boosts It.</h2>
+    <p>Using <span data-tip="Zero-Inflated Negative Binomial — a statistical model that handles both 'no trips ever' zones and low-trip zones separately">ZINB regression models</span> across all five cities, the researchers identified factors that reliably predict how many trips an area generates on any given day.</p>
+
+    <div class="factors-grid section">
+      <div class="factor-card positive">
+        <div class="factor-direction pos">↑ Increases demand</div>
+        <div class="factor-title">Transit Accessibility (LITA)</div>
+        <div class="factor-desc">Zones near frequent, high-capacity transit generate more trips. Scooters complement — not compete with — public transport.</div>
+      </div>
+      <div class="factor-card positive">
+        <div class="factor-direction pos">↑ Increases demand</div>
+        <div class="factor-title">Warmer Temperature</div>
+        <div class="factor-desc">Demand rises consistently with temperature in 4 of 5 cities. Chicago is the exception — temperature wasn't statistically significant there.</div>
+      </div>
+      <div class="factor-card positive">
+        <div class="factor-direction pos">↑ Increases demand</div>
+        <div class="factor-title">Bike Lanes & Shared Stations</div>
+        <div class="factor-desc">More bike infrastructure correlates with more scooter trips — suggesting scooters thrive where active mobility is already valued.</div>
+      </div>
+      <div class="factor-card positive">
+        <div class="factor-direction pos">↑ Increases demand</div>
+        <div class="factor-title">Young Adults (18–24)</div>
+        <div class="factor-desc">Zones with a higher share of young adults generate significantly more trips in Louisville and Minneapolis.</div>
+      </div>
+      <div class="factor-card negative">
+        <div class="factor-direction neg">↓ Decreases demand</div>
+        <div class="factor-title">Rain & Snow</div>
+        <div class="factor-desc">Precipitation reliably reduces trips across all cities. Snow is an even stronger suppressant — reducing demand by up to 80% in Minneapolis.</div>
+      </div>
+      <div class="factor-card negative">
+        <div class="factor-direction neg">↓ Decreases demand</div>
+        <div class="factor-title">Residential Land Use</div>
+        <div class="factor-desc">Purely residential neighborhoods generate fewer trips than mixed-use or commercial areas. Scooters thrive in activity centers.</div>
+      </div>
+      <div class="factor-card negative">
+        <div class="factor-direction neg">↓ Decreases demand</div>
+        <div class="factor-title">Children under 18</div>
+        <div class="factor-desc">Areas with more children (and presumably older residents) show lower demand — pointing to an age-skewed user base.</div>
+      </div>
+      <div class="factor-card mixed">
+        <div class="factor-direction mix">↕ Context-dependent</div>
+        <div class="factor-title">Wind Speed</div>
+        <div class="factor-desc">Wind increases ridership in Austin but decreases it in Chicago and Louisville. Local conditions and rider culture likely mediate this effect.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"><span>The Trip Itself</span></div>
+
+  <!-- TRIP CHARACTERISTICS -->
+  <div class="section">
+    <div class="section-label">Trip Characteristics</div>
+    <h2>Short, Slow, and Remarkably Consistent</h2>
+    <p>The average e-scooter trip covers <strong>1.7 km</strong> in about <strong>11 minutes</strong> at <strong>10 km/h</strong>. These numbers barely budge across five cities with radically different urban forms, climates, and populations.</p>
+
+    <div class="chart-container section" id="tripChart">
+      <div class="chart-title">Average Trip Distance by City (km)</div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">Chicago</div>
+          <div class="bar-track"><div class="bar-fill accent" style="--w:0.76" data-width="0.76"></div></div>
+          <div class="bar-value">2.3</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Austin (pilot)</div>
+          <div class="bar-track"><div class="bar-fill" style="--w:0.67" data-width="0.67"></div></div>
+          <div class="bar-value">2.0</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Louisville (pilot)</div>
+          <div class="bar-track"><div class="bar-fill" style="--w:0.93" data-width="0.93"></div></div>
+          <div class="bar-value">2.8</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Minneapolis</div>
+          <div class="bar-track"><div class="bar-fill" style="--w:0.70" data-width="0.70"></div></div>
+          <div class="bar-value">2.1</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Calgary</div>
+          <div class="bar-track"><div class="bar-fill green" style="--w:0.60" data-width="0.60"></div></div>
+          <div class="bar-value">1.8</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Austin (regular)</div>
+          <div class="bar-track"><div class="bar-fill" style="--w:0.53" data-width="0.53"></div></div>
+          <div class="bar-value">1.6</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Louisville (reg.)</div>
+          <div class="bar-track"><div class="bar-fill" style="--w:0.67" data-width="0.67"></div></div>
+          <div class="bar-value">2.0</div>
+        </div>
+      </div>
+    </div>
+
+    <p>A key finding: <mark>pilot-phase trips are longer, faster, and more exploratory</mark> than regular-use trips. As users become familiar with the service, they settle into shorter, more purposeful journeys. This has real implications: cities that evaluate a scooter pilot expecting regular-use behavior may be disappointed — or pleasantly surprised.</p>
+
+    <p>Chicago's speed advantage (12 km/h average) likely reflects its wide bike lanes and high cyclist culture. Louisville's longer trips may be partly explained by its lower per-minute pricing. The underlying physics of e-scooter travel, however, is highly consistent.</p>
+  </div>
+
+  <div class="section-divider"><span>Policy Implications</span></div>
+
+  <!-- POLICY -->
+  <div class="section">
+    <div class="section-label">What This Means for Cities</div>
+    <h2>Evidence, Finally, for Evidence-Based Policy</h2>
+    <p>The study's authors are direct: scooter regulation has too often preceded understanding. These findings offer actionable guidance for cities deploying or managing shared e-scooter services.</p>
+
+    <div class="finding-box">
+      <div class="finding-icon">📡</div>
+      <div class="finding-content">
+        <h4>Synchronize Fleet with Demand — Including Events</h4>
+        <p>Maintenance and redistribution should follow the bimodal weekday pattern. Weekend redistribution must cover wider areas. Special events warrant 3–4× normal fleet density in affected zones.</p>
+      </div>
+    </div>
+    <div class="finding-box">
+      <div class="finding-icon">🚌</div>
+      <div class="finding-content">
+        <h4>Invest in Transit-Scooter Integration</h4>
+        <p>Higher transit accessibility drives more scooter demand — not less. Subsidizing scooter trips for transit users, or extending PT ticket validity to include micromobility, could unlock substantial modal shift away from cars.</p>
+      </div>
+    </div>
+    <div class="finding-box">
+      <div class="finding-icon">⚠️</div>
+      <div class="finding-content">
+        <h4>Early Use = Higher Risk</h4>
+        <p>Pilot-phase trips are faster and longer — and injury data shows accidents correlate with service unfamiliarity. Speed monitoring and user education should be most intensive in the first months of deployment.</p>
+      </div>
+    </div>
+    <div class="finding-box">
+      <div class="finding-icon">⚖️</div>
+      <div class="finding-content">
+        <h4>Equity Remains Unsolved</h4>
+        <p>Income positively predicts scooter use. Despite Chicago requiring operators to deploy in underserved areas, only 0.05% of trips were made by unbanked users. Cities need better monitoring — and different strategies — to make scooters truly equitable.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section section">
+    <h2>The Full Picture Awaits</h2>
+    <p>This blog post covers the headline findings. The full paper digs into the statistical models, spatial regression outputs, and city-by-city breakdowns in rigorous detail.</p>
+    <a href="https://doi.org/10.1016/j.tra.2023.103602" class="cta-btn" target="_blank">Read the Full Paper →</a>
+  </div>
+
+  <div class="citation section">
+    Abouelela, M., Chaniotakis, E., & Antoniou, C. (2023). Understanding the landscape of shared-e-scooters in North America; Spatiotemporal analysis and policy insights. <em>Transportation Research Part A</em>, 169, 103602. https://doi.org/10.1016/j.tra.2023.103602
+  </div>
+
+</main>
+
+<script>
+// PROGRESS BAR
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('progress-bar').style.width = (scrolled / total * 100) + '%';
+});
+
+// INTERSECTION OBSERVER for sections
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // Animate bars when visible
+      e.target.querySelectorAll('.bar-fill').forEach((bar, i) => {
+        setTimeout(() => {
+          bar.style.transform = `scaleX(${bar.dataset.width})`;
+          bar.classList.add('animate');
+        }, i * 80);
+      });
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.section').forEach(s => observer.observe(s));
+
+// CITY TABS
+function switchTab(city, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + city).classList.add('active');
+  btn.classList.add('active');
+}
+
+// DEMAND VISUALIZATION
+const weekdayPattern = [1, 0.8, 0.6, 0.5, 0.6, 1.0, 2.5, 5.5, 8.5, 7.0, 6.0, 6.5, 7.0, 6.5, 6.0, 6.5, 7.0, 9.5, 10.5, 9.0, 7.5, 6.0, 4.5, 2.5];
+const weekendPattern = [3.5, 2.8, 2.2, 1.8, 1.2, 0.9, 0.8, 1.0, 1.5, 3.0, 5.5, 7.5, 9.0, 10.0, 10.5, 11.5, 11.0, 10.0, 8.5, 7.0, 5.5, 4.5, 4.0, 3.8];
+
+let currentPattern = weekdayPattern;
+
+function renderHourGrid(pattern) {
+  const grid = document.getElementById('hourGrid');
+  const max = Math.max(...pattern);
+  grid.innerHTML = '';
+  pattern.forEach((val, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'hour-bar';
+    bar.dataset.hour = i === 0 ? '12a' : i < 12 ? i + 'a' : i === 12 ? '12p' : (i-12) + 'p';
+    const h = Math.round((val / max) * 120);
+    bar.style.height = h + 'px';
+    bar.style.background = val === max ? '#e8431a' : val > max * 0.7 ? '#c8a87a' : 'rgba(245,240,232,0.25)';
+    bar.title = `${bar.dataset.hour}: ~${val.toFixed(1)}% of daily trips`;
+    grid.appendChild(bar);
+  });
+}
+
+function switchDay(type, btn) {
+  document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPattern = type === 'weekday' ? weekdayPattern : weekendPattern;
+  renderHourGrid(currentPattern);
+}
+
+renderHourGrid(weekdayPattern);
+
+// Auto-init bars that are already visible
+document.querySelectorAll('.bar-fill').forEach(bar => {
+  bar.style.transform = `scaleX(0)`;
+});
+</script>
+</body>
+</html>

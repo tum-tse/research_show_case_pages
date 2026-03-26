@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will E-Scooters Eat Into Carsharing? | Research Blog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Lora:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #111827;
+    --electric: #0ea5e9;
+    --electric-dark: #0369a1;
+    --lime: #65a30d;
+    --amber: #d97706;
+    --danger: #dc2626;
+    --slate: #475569;
+    --mist: #f0f9ff;
+    --border: #e0f2fe;
+    --muted: #64748b;
+    --neutral: #94a3b8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  .progress {
+    position: fixed; top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--electric), var(--lime));
+    z-index: 200;
+    transition: width 0.1s linear;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Circuit-board style background */
+  .hero-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(14,165,233,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14,165,233,0.06) 1px, transparent 1px),
+      linear-gradient(rgba(14,165,233,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14,165,233,0.03) 1px, transparent 1px);
+    background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+    pointer-events: none;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(14,165,233,0.15) 0%, transparent 70%);
+    top: -100px; left: -100px;
+    pointer-events: none;
+  }
+
+  .hero-glow-2 {
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(101,163,13,0.1) 0%, transparent 70%);
+    bottom: 0; right: 0;
+    pointer-events: none;
+  }
+
+  .hero-nav {
+    position: relative; z-index: 2;
+    padding: 1.75rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .nav-tag {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+  }
+
+  .nav-badge {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--electric);
+    border: 1px solid rgba(14,165,233,0.3);
+    padding: 0.3rem 0.8rem;
+    border-radius: 2px;
+  }
+
+  .hero-body {
+    position: relative; z-index: 2;
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    padding: 4rem 3rem 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .hero-kicker {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--electric);
+    display: block;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1.05;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  h1 .hl { color: var(--electric); }
+
+  .hero-deck {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.55);
+    max-width: 44ch;
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+
+  .hero-meta {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.58rem;
+    color: rgba(255,255,255,0.22);
+    letter-spacing: 0.08em;
+    line-height: 2;
+  }
+
+  /* Hero right — answer display */
+  .answer-block {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(14,165,233,0.2);
+    border-radius: 6px;
+    padding: 2rem;
+  }
+
+  .answer-label {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .answer-big {
+    font-family: 'Outfit', sans-serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--electric);
+    line-height: 1;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .answer-subtitle {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.08em;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .answer-conditions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .cond-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.55);
+  }
+
+  .cond-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .cond-dot.good  { background: var(--lime); }
+  .cond-dot.bad   { background: var(--danger); }
+  .cond-dot.neut  { background: var(--amber); }
+
+  .range-label {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.58rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.06em;
+    display: block;
+  }
+
+  .hero-scroll {
+    position: relative; z-index: 2;
+    padding: 1.5rem 3rem 2rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .scroll-line { width: 36px; height: 1px; background: rgba(255,255,255,0.12); animation: sl 2s ease-in-out infinite; }
+  @keyframes sl { 0%,100%{width:36px}50%{width:65px} }
+
+  /* ── MAIN ── */
+  main { max-width: 780px; margin: 0 auto; padding: 5rem 2rem; }
+
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.65s ease, transform 0.65s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .section { margin-bottom: 5rem; }
+
+  .section-label {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--electric-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .section-label::before { content:''; width:20px; height:2px; background:var(--electric); flex-shrink:0; }
+
+  h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  p { color: #1e3a4a; margin-bottom: 1.25rem; font-size: 1.02rem; }
+
+  .pull-quote {
+    margin: 2.5rem 0;
+    padding: 1.5rem 1.75rem 1.5rem 2rem;
+    border-left: 3px solid var(--electric);
+    background: var(--mist);
+  }
+
+  .pull-quote p {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* ── SCENARIO SIMULATOR ── */
+  .simulator {
+    background: var(--ink);
+    border-radius: 6px;
+    padding: 2rem;
+    margin: 2.5rem 0;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .simulator h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.35rem;
+  }
+
+  .sim-sub {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.58rem;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.06em;
+    margin-bottom: 1.75rem;
+  }
+
+  .sim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sim-field label {
+    display: block;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 0.45rem;
+  }
+
+  .sim-field select {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.85);
+    padding: 0.55rem 0.8rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.72rem;
+    border-radius: 3px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .sim-result {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .sim-pct {
+    font-family: 'Outfit', sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.4s ease;
+  }
+
+  .sim-pct.high { color: var(--electric); }
+  .sim-pct.med  { color: var(--amber); }
+  .sim-pct.low  { color: var(--danger); }
+
+  .sim-text { flex: 1; }
+
+  .sim-verdict {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    transition: color 0.4s ease;
+  }
+
+  .sim-verdict.high { color: var(--electric); }
+  .sim-verdict.med  { color: var(--amber); }
+  .sim-verdict.low  { color: var(--danger); }
+
+  .sim-desc {
+    font-size: 0.83rem;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── MODE COMPARISON ── */
+  .mode-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .mode-card {
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .mode-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .mode-card.car::after  { background: var(--slate); }
+  .mode-card.scoot::after{ background: var(--electric); }
+
+  .mode-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+
+  .mode-icon { font-size: 2rem; display: block; margin-bottom: 0.6rem; }
+
+  .mode-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .mode-attr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .mode-attr:last-child { border-bottom: none; }
+
+  .attr-name { color: var(--muted); }
+  .attr-val  { font-family: 'Fira Code', monospace; font-size: 0.75rem; font-weight: 500; color: var(--ink); }
+
+  /* ── KEY FACTORS ── */
+  .factor-list {
+    list-style: none;
+    margin: 1.5rem 0;
+  }
+
+  .factor-item {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .factor-item:last-child { border-bottom: none; }
+
+  .factor-badge {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.62rem;
+    font-weight: 500;
+    padding: 0.25rem 0.65rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .badge-strong { background: rgba(14,165,233,0.1); color: var(--electric-dark); }
+  .badge-neg    { background: rgba(220,38,38,0.08); color: var(--danger); }
+  .badge-mod    { background: rgba(217,119,6,0.1);  color: var(--amber); }
+
+  .factor-text { flex: 1; }
+  .factor-text strong { display: block; font-weight: 600; font-size: 0.95rem; color: var(--ink); margin-bottom: 0.25rem; }
+  .factor-text span   { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── ACCORDION ── */
+  .accordion { margin: 1.5rem 0; }
+  .acc-item { border-top: 1px solid var(--border); }
+  .acc-trigger {
+    width: 100%; background: none; border: none; padding: 1.1rem 0;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; font-family: 'Outfit', sans-serif; font-size: 0.95rem;
+    font-weight: 400; color: var(--ink); text-align: left; gap: 1rem;
+  }
+  .acc-trigger:hover { color: var(--electric-dark); }
+  .acc-icon { font-family: 'Fira Code', monospace; font-size: 1.1rem; color: var(--neutral); transition: transform 0.3s ease; flex-shrink: 0; }
+  .acc-item.open .acc-icon { transform: rotate(45deg); color: var(--electric); }
+  .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+  .acc-body-inner { padding: 0 0 1.25rem; font-size: 0.92rem; color: #2a4060; line-height: 1.7; }
+
+  /* ── DIVIDER ── */
+  .divider { display: flex; align-items: center; gap: 1rem; margin: 4rem 0; }
+  .divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .divider span { font-family:'Fira Code',monospace; font-size:0.6rem; letter-spacing:0.2em; color:var(--neutral); }
+
+  /* ── FINDINGS ── */
+  .finding { display: flex; gap: 1.5rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+  .finding:last-child { border-bottom: none; }
+  .finding-n { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 900; color: var(--border); line-height: 1; flex-shrink: 0; width: 2.75rem; text-align: right; }
+  .finding-body strong { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.97rem; color: var(--ink); display: block; margin-bottom: 0.35rem; }
+  .finding-body p { font-size: 0.9rem; color: var(--muted); margin: 0; line-height: 1.65; }
+
+  /* ── CTA ── */
+  .cta-block {
+    background: linear-gradient(135deg, var(--ink) 0%, #0f2540 100%);
+    color: #fff; padding: 3rem; border-radius: 6px; text-align: center; margin-top: 5rem;
+    position: relative; overflow: hidden;
+  }
+
+  .cta-block::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(14,165,233,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14,165,233,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .cta-block h2 { color: #fff; position: relative; z-index: 1; margin-bottom: 0.75rem; }
+  .cta-block p  { color: rgba(255,255,255,0.5); max-width: 50ch; margin: 0 auto 2rem; position: relative; z-index: 1; font-size: 0.95rem; }
+
+  .cta-btn {
+    display: inline-block; background: var(--electric); color: #fff;
+    padding: 0.9rem 2.25rem; font-family: 'Fira Code', monospace;
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    text-decoration: none; border-radius: 3px; position: relative; z-index: 1;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .cta-btn:hover { background: var(--electric-dark); transform: translateY(-2px); }
+  .cta-meta { margin-top: 1.25rem; font-family: 'Fira Code', monospace; font-size: 0.58rem; color: rgba(255,255,255,0.18); letter-spacing: 0.1em; position: relative; z-index: 1; }
+
+  @media (max-width: 760px) {
+    .hero-body { grid-template-columns: 1fr; gap: 2.5rem; padding: 3rem 1.5rem 2rem; }
+    .hero-nav { padding: 1.25rem 1.5rem; }
+    main { padding: 3rem 1.25rem; }
+    .mode-compare, .sim-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progressBar"></div>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+
+  <nav class="hero-nav">
+    <span class="nav-tag">Transportation Research Part D · 2021</span>
+    <span class="nav-badge">Munich Case Study</span>
+  </nav>
+
+  <div class="hero-body">
+    <div class="hero-left">
+      <span class="hero-kicker">Research Explainer · Micromobility vs. Carsharing</span>
+      <h1>Can e-scooters disrupt <span class="hl">carsharing</span> in cities?</h1>
+      <p class="hero-deck">
+        Electric scooters appeared on city streets almost overnight. Carsharing has been quietly growing for decades. This Munich study asks the first rigorous question: if e-scooters are available, will young carsharing users switch?
+      </p>
+      <div class="hero-meta">
+        Abouelela · Al Haddad · Antoniou<br>
+        Technical University of Munich<br>
+        N = 503 respondents · 972,459 carsharing trips · 1,620 scenarios tested
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="answer-block">
+        <span class="answer-label">Best-case scooter attraction of carsharing trips (0–4 km)</span>
+        <span class="answer-big">23%</span>
+        <span class="answer-subtitle">of short carsharing trips could shift to e-scooters</span>
+        <div class="answer-conditions">
+          <div class="cond-row"><div class="cond-dot good"></div>Scooter risk = same as carsharing</div>
+          <div class="cond-row"><div class="cond-dot good"></div>Scooter fare: €1 + €0.15/min</div>
+          <div class="cond-row"><div class="cond-dot good"></div>Scooter speed: 22 km/h</div>
+          <div class="cond-row"><div class="cond-dot bad"></div>Carsharing fare: €0.36/min</div>
+          <div class="cond-row"><div class="cond-dot neut"></div>Trip distance: 0–4 km only</div>
+          <div class="cond-row"><div class="cond-dot bad"></div>Above 4 km: scooter share ≈ 0%</div>
+        </div>
+        <span class="range-label">Worst case (4× accident risk): 13% attraction · Best case: 23%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll to explore
+  </div>
+</section>
+
+<main>
+
+  <section class="section reveal">
+    <div class="section-label">The Problem</div>
+    <h2>Two shared modes. One city. Who wins the short trip?</h2>
+    <p>
+      E-scooters exploded onto urban streets around 2018–2019 with very little regulatory preparation and even less research into how they would interact with existing shared modes. Most studies asked what scooters replaced — the typical answers were walking, ride-hailing, and personal vehicles. Almost no one had looked at whether scooters could pull users away from <em>carsharing</em>.
+    </p>
+    <p>
+      This is a genuine gap: carsharing and e-scooters share a surprising amount of DNA. Both are dockless (or semi-dockless), app-based, and accessed on demand. Both target short urban trips. Both appeal to a young, urban, tech-comfortable demographic. For a trip of 2–3 km, a carsharing vehicle and a shared scooter could plausibly compete for the same user making the same journey.
+    </p>
+    <p>
+      The study fills this gap with a stated preference experiment in Munich — one of Europe's leading carsharing cities — targeting 18–34 year olds, who represent both the current core of carsharing early adopters and the likely first wave of e-scooter users. The key question is simple: given the same trip, and varying conditions, which would they choose?
+    </p>
+
+    <div class="pull-quote">
+      <p>No previous study had conducted a stated preference experiment including scooter-sharing as a main mode of transport. This study attempts to close that gap.</p>
+    </div>
+  </section>
+
+  <div class="divider"><span>⚡</span></div>
+
+  <section class="section reveal">
+    <div class="section-label">Mode Comparison</div>
+    <h2>Carsharing vs. e-scooters: comparing the modes directly</h2>
+    <p>The choice model incorporates attributes specific to each mode. Understanding how they differ on each dimension helps explain the model results.</p>
+
+    <div class="mode-compare">
+      <div class="mode-card car">
+        <span class="mode-icon">🚗</span>
+        <span class="mode-title">Carsharing</span>
+        <div class="mode-attr">
+          <span class="attr-name">Travel time</span>
+          <span class="attr-val">5–11 min (survey)</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Access + egress</span>
+          <span class="attr-val">1–5 min (walk to car)</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Cost range (Munich)</span>
+          <span class="attr-val">€0.19–0.36/min</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Weather impact</span>
+          <span class="attr-val">Positive — rain ↑ utility</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Accident risk</span>
+          <span class="attr-val">Reference level</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Gender effect</span>
+          <span class="attr-val">Women less likely (−0.195)</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Effective range</span>
+          <span class="attr-val">Up to 50 km / 2 hours</span>
+        </div>
+      </div>
+
+      <div class="mode-card scoot">
+        <span class="mode-icon">🛴</span>
+        <span class="mode-title">E-Scooter Sharing</span>
+        <div class="mode-attr">
+          <span class="attr-name">Travel time</span>
+          <span class="attr-val">8–14 min (survey)</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Access + egress</span>
+          <span class="attr-val">Not significant in model</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Cost range (Munich)</span>
+          <span class="attr-val">€1 + €0.15–0.25/min</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Weather impact</span>
+          <span class="attr-val">Strongly negative (−0.977)</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Accident risk</span>
+          <span class="attr-val">Up to 4× higher vs. car</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Gender effect</span>
+          <span class="attr-val">Women strongly less likely (−0.344)</span>
+        </div>
+        <div class="mode-attr">
+          <span class="attr-name">Effective range</span>
+          <span class="attr-val">Practically zero above 4 km</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><span>⚡</span></div>
+
+  <section class="section reveal">
+    <div class="section-label">Interactive Simulator</div>
+    <h2>What percentage of carsharing trips shift to scooters?</h2>
+    <p>The researchers ran 1,620 scenarios varying scooter cost, speed, risk, carsharing cost, and route diversion. Explore the key dimensions below — mirroring the paper's sensitivity analysis (Figures 5–6).</p>
+
+    <div class="simulator">
+      <h3>Shift-to-Scooter Scenario Explorer</h3>
+      <p class="sim-sub">BASED ON SENSITIVITY ANALYSIS · ABOUELELA ET AL. 2021 · TRIPS 0–4 KM ONLY</p>
+
+      <div class="sim-grid">
+        <div class="sim-field">
+          <label>Scooter accident risk</label>
+          <select id="sRisk" onchange="updateSim()">
+            <option value="equal">Same as carsharing (best case)</option>
+            <option value="4x">4× higher than carsharing (worst case)</option>
+          </select>
+        </div>
+        <div class="sim-field">
+          <label>Scooter cost per minute</label>
+          <select id="sCost" onchange="updateSim()">
+            <option value="low">€1 + €0.15/min (cheapest)</option>
+            <option value="mid">€1 + €0.20/min (mid)</option>
+            <option value="high">€1 + €0.25/min (most expensive)</option>
+          </select>
+        </div>
+        <div class="sim-field">
+          <label>Carsharing cost per minute</label>
+          <select id="csCost" onchange="updateSim()">
+            <option value="high">€0.36/min (most expensive)</option>
+            <option value="mid">€0.28/min (mid)</option>
+            <option value="low">€0.20/min (cheapest)</option>
+          </select>
+        </div>
+        <div class="sim-field">
+          <label>Weather condition</label>
+          <select id="sWeather" onchange="updateSim()">
+            <option value="dry">Dry / no rain</option>
+            <option value="rain">Rainy</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sim-result">
+        <div class="sim-pct high" id="simPct">—</div>
+        <div class="sim-text">
+          <div class="sim-verdict high" id="simVerdict">Configure scenario above</div>
+          <p class="sim-desc" id="simDesc">Select conditions to estimate the percentage of short carsharing trips that would shift to e-scooters under those conditions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><span>⚡</span></div>
+
+  <section class="section reveal">
+    <div class="section-label">Model Results</div>
+    <h2>What the choice model tells us about decision-making</h2>
+    <p>The multinomial logit model (N = 4,527 observations from 503 respondents) estimates how each attribute shapes the probability of choosing between carsharing, scooter-sharing, and "neither". Here are the key findings.</p>
+
+    <ul class="factor-list">
+      <li class="factor-item">
+        <span class="factor-badge badge-strong">↑ Very strong</span>
+        <div class="factor-text">
+          <strong>Travel cost — most significant predictor for both modes</strong>
+          <span>Cost coefficients were extremely significant at 99% and 98% for scooters and carsharing respectively. The scooter coefficient is larger in magnitude, meaning users are more cost-sensitive for scooters. Calculated value of time: ~€6.7/hour for scooters, ~€7.9/hour for carsharing — users are willing to pay slightly more per hour for carsharing.</span>
+        </div>
+      </li>
+      <li class="factor-item">
+        <span class="factor-badge badge-neg">↓ Strongest for scooter</span>
+        <div class="factor-text">
+          <strong>Rain — the single biggest deterrent to scooter use</strong>
+          <span>The rain coefficient for scooters (−0.977) is the highest in magnitude and significance of all scooter attributes (99% confidence). By contrast, rain has a positive effect on carsharing utility (+0.159) — rain pushes users toward enclosed vehicles. This asymmetry alone could drive dramatic seasonal variation in scooter-to-carsharing competition.</span>
+        </div>
+      </li>
+      <li class="factor-item">
+        <span class="factor-badge badge-neg">↓ Significant</span>
+        <div class="factor-text">
+          <strong>Accident risk — only 4× risk is significantly negative</strong>
+          <span>The model tested scooter accident risk at 1×, 2×, and 4× carsharing risk. Only the 4× level was significant (−0.369, 99%). The 2× level was removed as insignificant. This means users are somewhat tolerant of moderately higher scooter risk, but draw a clear line at very high accident probability differentials.</span>
+        </div>
+      </li>
+      <li class="factor-item">
+        <span class="factor-badge badge-mod">↓ Gender effect</span>
+        <div class="factor-text">
+          <strong>Female — less likely to use both modes, much less for scooters</strong>
+          <span>Women are less likely to choose carsharing (−0.195, 90% significance) and significantly less likely to choose scooters (−0.344, 99% significance). The larger magnitude for scooters is consistent with city pilot reports from Calgary, Paris, and San Francisco showing 70–80% male scooter user bases. Safety perceptions and physical comfort on scooters may drive this gap.</span>
+        </div>
+      </li>
+      <li class="factor-item">
+        <span class="factor-badge badge-mod">↓ Moderate</span>
+        <div class="factor-text">
+          <strong>Travel time — more important for scooters than carsharing</strong>
+          <span>In-vehicle travel time was significant for scooters at 90% confidence; total travel time (including access and egress) was used for carsharing and was less significant. Access and egress times for scooters were surprisingly not significant — possibly because scooters are typically found nearby and the egress is immediate. This is an important finding for service design: for scooters, cutting in-vehicle time matters more than reducing the walk to the vehicle.</span>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <div class="divider"><span>⚡</span></div>
+
+  <section class="section reveal">
+    <div class="section-label">The Critical Constraint</div>
+    <h2>Distance kills scooter competitiveness — completely</h2>
+    <p>
+      The most striking finding from the scenario analysis is how brutally distance-sensitive e-scooter competitiveness is. For trips above 4 km, the model predicts the scooter's market share approaches zero — not declines, but effectively disappears.
+    </p>
+    <p>
+      This is consistent with observed data from five North American cities used in the model: average scooter trip distances are 1.6 km (San Francisco), 1.85 km (Portland), and 2.4 km (Chicago). Scooters at 10–22 km/h simply cannot compete with a car on a 6 km trip.
+    </p>
+    <p>
+      The implication is that carsharing operators with a trip profile dominated by longer journeys have little to fear from e-scooter competition. But for operators with concentrated short-trip demand in dense urban cores — particularly leisure and access trips of 1–4 km — the 13–23% scenario range is a meaningful competitive threat.
+    </p>
+    <p>
+      In the Munich case study, after filtering the carsharing dataset to the 0–4 km range, that 23% shift would translate to approximately 44,624 trips or 118,060 km being redirected to scooters.
+    </p>
+
+    <div class="pull-quote">
+      <p>For distances above 4 km, the share of e-scooters is practically zero. The competitive window is narrow — but within it, the disruption potential is real.</p>
+    </div>
+  </section>
+
+  <div class="divider"><span>⚡</span></div>
+
+  <section class="section reveal">
+    <div class="section-label">Context from City Pilots</div>
+    <h2>What real-world pilots from six cities tell us</h2>
+    <p>The paper synthesises findings from scooter pilots in Calgary, Chicago, Bloomington, Paris/Lyon/Marseille, San Francisco, and Portland. The consistent patterns across these cities inform and validate the Munich model.</p>
+
+    <div class="accordion">
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          What did scooters actually replace in these cities?
+          <span class="acc-icon">+</span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-body-inner">
+            The dominant replacement modes in most cities were walking (Calgary, Bloomington, Portland, Paris-Lyon-Marseille) and ride-hailing/personal vehicles (Chicago, San Francisco, Portland). This creates an important environmental nuance: if scooters replace walking, they are generating new motorised trip kilometres rather than substituting them. The energy saving only materialises when scooters replace actual motor vehicles. The Munich model specifically asks about carsharing substitution — positioning scooters as a genuine vehicle substitute rather than a leisure add-on. This distinguishes the study from most city pilot analyses.
+          </div>
+        </div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          Who uses e-scooters? The demographic consistency across cities
+          <span class="acc-icon">+</span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-body-inner">
+            Across all studied cities, e-scooter users were consistently young (under 35), predominantly male, high-income, and highly educated. Calgary: ages 25–44, males, high income. Chicago: white, high-income, educated. San Francisco: mostly male, young 25–34. Paris-Lyon-Marseille: under 35, mostly men. This profile is nearly identical to the carsharing early adopter profile — which is precisely why the carsharing-to-scooter competition question is worth asking. These modes share a user base.
+          </div>
+        </div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          Why do people NOT use scooters? The barrier evidence
+          <span class="acc-icon">+</span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-body-inner">
+            Safety concerns dominated non-use explanations across all cities that collected this data. Price appeared as a barrier in France. Lack of awareness about parking rules was significant in Chicago. Weather deterred use — San Francisco saw notable demand drops November to February. In France, enforcement of regulations (helmet requirements, 15 km/h speed limits, parking rules) was associated with reduced scooter use. Interestingly, San Francisco found that enforcement of parking guidelines actually reduced complaints about scooters — suggesting that clear, enforced regulation may improve user experience even if it reduces total ridership.
+          </div>
+        </div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-trigger" onclick="toggleAcc(this)">
+          How should regulators approach scooter integration with carsharing?
+          <span class="acc-icon">+</span>
+        </button>
+        <div class="acc-body">
+          <div class="acc-body-inner">
+            The paper draws on multiple sources to argue that responsible scooter policy requires attention to infrastructure (dedicated curb space and parking), speed regulation (many pilots used 15–25 km/h limits), safety guidelines, a limited number of licensed operators, and data-sharing requirements. For carsharing specifically, operators may need to actively differentiate from scooters by emphasising the attributes the model says carsharing wins on: longer-distance trips, all-weather use, enclosed safety, and accessibility for women. The model's finding that carsharing has a higher "value of time" (€7.9/hr vs. €6.7/hr for scooters) suggests users see carsharing as a premium mode worth paying slightly more for per minute of travel — a positioning lever for operators.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><span>⚡</span></div>
+
+  <section class="section reveal">
+    <div class="section-label">Policy Implications</div>
+    <h2>Four takeaways for cities and carsharing operators</h2>
+
+    <div class="finding">
+      <div class="finding-n">01</div>
+      <div class="finding-body">
+        <strong>Short-trip carsharing demand is genuinely at risk — monitor the 0–4 km segment</strong>
+        <p>Operators with concentrated short-trip demand in urban cores should watch scooter adoption closely. A 13–23% shift in this segment represents meaningful revenue impact. Fleet rebalancing strategies and pricing differentiation for short trips may become necessary as scooter fleets mature and safety regulations improve.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div class="finding-n">02</div>
+      <div class="finding-body">
+        <strong>Scooter safety improvement is the variable that most changes the competitive landscape</strong>
+        <p>The model shows that closing the accident risk gap between scooters and carsharing shifts the best-case scenario from 13% to 23% attraction. Infrastructure investment — dedicated scooter lanes, lower speed limits in high-density areas, mandatory helmets — is therefore not just a public safety measure. It directly determines how aggressively scooters will compete with enclosed shared vehicles.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div class="finding-n">03</div>
+      <div class="finding-body">
+        <strong>Gender equity in micromobility requires active design intervention</strong>
+        <p>Women are significantly less likely to choose scooters — with a larger coefficient than for carsharing. City pilots confirm male-dominated scooter user bases. Addressing this requires physical infrastructure (dedicated lanes, separated from traffic), safety assurance, and potentially different vehicle designs. Without intervention, scooter-sharing risks embedding a gender mobility gap that carsharing does not have to the same degree.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div class="finding-n">04</div>
+      <div class="finding-body">
+        <strong>The environmental case depends entirely on what scooters replace</strong>
+        <p>If e-scooters shift 44,624 carsharing trips in Munich (0–4 km), that represents roughly 57,850 kWh of energy savings — assuming the carsharing trips involved motor vehicles. But if scooters instead pull users from walking or cycling — as some city pilots suggest — the environmental balance is negative. Policy incentives should target scooter use specifically for motor vehicle substitution, not general micromobility promotion.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-block reveal">
+    <h2>Read the full paper</h2>
+    <p>This explainer covers the main findings. The full paper includes complete model estimation tables, all 1,620 scenario results, detailed sensitivity analysis figures by trip distance, scooter price and risk, and the full carsharing trip data analysis for Munich.</p>
+    <a href="https://doi.org/10.1016/j.trd.2021.102821" target="_blank" class="cta-btn">Read the Full Paper →</a>
+    <p class="cta-meta">Abouelela · Al Haddad · Antoniou (2021) · Transportation Research Part D · Vol. 95 · DOI: 10.1016/j.trd.2021.102821</p>
+  </div>
+
+</main>
+
+<script>
+window.addEventListener('scroll', () => {
+  const pct = Math.min(100, (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+function toggleAcc(btn) {
+  const item = btn.closest('.acc-item');
+  const body = item.querySelector('.acc-body');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.acc-body').style.maxHeight = '0';
+  });
+  if (!isOpen) {
+    item.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+
+// Scenario simulator — approximate model-derived values
+function updateSim() {
+  const risk    = document.getElementById('sRisk').value;
+  const sCost   = document.getElementById('sCost').value;
+  const csCost  = document.getElementById('csCost').value;
+  const weather = document.getElementById('sWeather').value;
+
+  let score = 0;
+
+  if (risk === 'equal') score += 10; else score -= 5;
+  if (sCost === 'low') score += 5; else if (sCost === 'mid') score += 2; else score -= 2;
+  if (csCost === 'high') score += 6; else if (csCost === 'mid') score += 2; else score -= 4;
+  if (weather === 'rain') score -= 12;
+
+  // Map to realistic range [0..23]
+  const raw = Math.max(0, Math.min(23, Math.round(score * 1.3 + 8)));
+  const pct = raw + '%';
+
+  let level, verdict, desc;
+  if (weather === 'rain') {
+    level = 'low';
+    verdict = 'Rain eliminates scooter competitiveness';
+    desc = 'Rain is the strongest single deterrent to scooter use in the model (coefficient −0.977, 99% significance). Carsharing utility actually increases in wet conditions. Wet weather essentially shuts down the short-trip competition entirely.';
+  } else if (raw >= 18) {
+    level = 'high';
+    verdict = 'High scooter attraction — near best-case scenario';
+    desc = 'Optimal conditions: cheap scooters, expensive carsharing, equal accident risk. Under these conditions up to 23% of short carsharing trips could shift. This requires ideal scooter economics and safety parity with cars.';
+  } else if (raw >= 10) {
+    level = 'med';
+    verdict = 'Moderate scooter attraction';
+    desc = 'Realistic mid-range scenario. Some shift is plausible, but cost or risk disadvantages limit scooter appeal. This represents conditions closer to current operator pricing and observed safety differentials.';
+  } else {
+    level = 'low';
+    verdict = 'Low scooter attraction — carsharing holds';
+    desc = 'High accident risk or expensive scooters relative to carsharing keep users in cars. This worst-case scenario (13%) still represents some shift at the shortest distances, but carsharing retains the majority.';
+  }
+
+  document.getElementById('simPct').textContent = pct;
+  document.getElementById('simPct').className = 'sim-pct ' + level;
+  document.getElementById('simVerdict').textContent = verdict;
+  document.getElementById('simVerdict').className = 'sim-verdict ' + level;
+  document.getElementById('simDesc').textContent = desc;
+}
+
+updateSim();
+</script>
+</body>
+</html>
