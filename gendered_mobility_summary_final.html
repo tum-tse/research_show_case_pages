@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gendered Mobility — Special Issue Summary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+      --text-primary:   #1a1a2e;
+      --text-secondary: #4a5568;
+      --text-muted:     #718096;
+      --border:         #e2e8f0;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+
+      /* Section palette — muted, easy on the eye */
+      --c1-bg: #f0f4ff;  --c1-accent: #4a6fa5;  --c1-border: #c8d9f0;  --c1-tag: #dce8f8;
+      --c2-bg: #fff4f0;  --c2-accent: #c0614a;  --c2-border: #f0c8be;  --c2-tag: #fde8e2;
+      --c3-bg: #f0faf5;  --c3-accent: #3a8a6a;  --c3-border: #b8e0cc;  --c3-tag: #d5f0e4;
+      --c4-bg: #f5f0fb;  --c4-accent: #6b5ea8;  --c4-border: #ccc4e8;  --c4-tag: #e8e2f8;
+      --c5-bg: #fffbf0;  --c5-accent: #a07830;  --c5-border: #e8d4a0;  --c5-tag: #fdefd5;
+      --c6-bg: #f8f0f4;  --c6-accent: #8a4a65;  --c6-border: #e0bace;  --c6-tag: #f2dce8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      font-size: 15px;
+      color: var(--text-primary);
+      background: #f8f9fc;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem 2rem 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .hero-tag {
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #6b5ea8;
+      margin-bottom: 0.55rem;
+    }
+    .hero-title {
+      font-size: 23px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.3;
+      margin-bottom: 0.7rem;
+    }
+    .hero-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 640px;
+    }
+
+    /* ── Stats ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+    .stat {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.1rem;
+    }
+    .stat-num { font-size: 24px; font-weight: 600; line-height: 1; margin-bottom: 5px; }
+    .stat-label { font-size: 12px; color: var(--text-muted); line-height: 1.45; }
+
+    /* ── Section block ── */
+    .section {
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.1rem;
+      border: 1px solid;
+    }
+    .section-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 1.25rem; }
+    .section-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; flex-shrink: 0; margin-top: 2px;
+    }
+    .section-meta { flex: 1; }
+    .section-number {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      opacity: 0.55; margin-bottom: 2px;
+    }
+    .section-title { font-size: 16px; font-weight: 600; line-height: 1.3; }
+
+    /* Section colour themes */
+    .s1 { background: var(--c1-bg); border-color: var(--c1-border); }
+    .s1 .section-title { color: var(--c1-accent); }
+    .s1 .section-icon  { background: var(--c1-tag); }
+    .s1 .card          { background: #fff; border-color: var(--c1-border); }
+    .s1 .card-label    { color: var(--c1-accent); }
+    .s1 .insight-block { background: var(--c1-tag); border-left: 3px solid var(--c1-accent); }
+
+    .s2 { background: var(--c2-bg); border-color: var(--c2-border); }
+    .s2 .section-title { color: var(--c2-accent); }
+    .s2 .section-icon  { background: var(--c2-tag); }
+    .s2 .card          { background: #fff; border-color: var(--c2-border); }
+    .s2 .card-label    { color: var(--c2-accent); }
+    .s2 .insight-block { background: var(--c2-tag); border-left: 3px solid var(--c2-accent); }
+
+    .s3 { background: var(--c3-bg); border-color: var(--c3-border); }
+    .s3 .section-title { color: var(--c3-accent); }
+    .s3 .section-icon  { background: var(--c3-tag); }
+    .s3 .card          { background: #fff; border-color: var(--c3-border); }
+    .s3 .card-label    { color: var(--c3-accent); }
+    .s3 .insight-block { background: var(--c3-tag); border-left: 3px solid var(--c3-accent); }
+
+    .s4 { background: var(--c4-bg); border-color: var(--c4-border); }
+    .s4 .section-title { color: var(--c4-accent); }
+    .s4 .section-icon  { background: var(--c4-tag); }
+    .s4 .card          { background: #fff; border-color: var(--c4-border); }
+    .s4 .card-label    { color: var(--c4-accent); }
+    .s4 .insight-block { background: var(--c4-tag); border-left: 3px solid var(--c4-accent); }
+
+    .s5 { background: var(--c5-bg); border-color: var(--c5-border); }
+    .s5 .section-title { color: var(--c5-accent); }
+    .s5 .section-icon  { background: var(--c5-tag); }
+    .s5 .card          { background: #fff; border-color: var(--c5-border); }
+    .s5 .card-label    { color: var(--c5-accent); }
+    .s5 .insight-block { background: var(--c5-tag); border-left: 3px solid var(--c5-accent); }
+
+    .s6 { background: var(--c6-bg); border-color: var(--c6-border); }
+    .s6 .section-title { color: var(--c6-accent); }
+    .s6 .section-icon  { background: var(--c6-tag); }
+    .s6 .card          { background: #fff; border-color: var(--c6-border); }
+    .s6 .card-label    { color: var(--c6-accent); }
+    .s6 .insight-block { background: var(--c6-tag); border-left: 3px solid var(--c6-accent); }
+
+    /* ── Cards ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    .card { border: 1px solid; border-radius: var(--radius-md); padding: 1rem 1.1rem; }
+    .card-label {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 5px;
+    }
+    .card-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── Insight block ── */
+    .insight-block {
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1.1rem;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+    .insight-block strong { color: var(--text-primary); font-weight: 600; }
+    .insight-block + .card-grid { margin-top: 1rem; }
+
+    /* ── Progress bars ── */
+    .prog-section { margin-bottom: 1rem; }
+    .prog-row { margin-bottom: 10px; }
+    .prog-label {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;
+    }
+    .prog-bar-bg { height: 6px; background: rgba(0,0,0,0.08); border-radius: 3px; overflow: hidden; }
+    .prog-bar-fill { height: 100%; border-radius: 3px; }
+    .prog-note { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 2rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .footer-text { flex: 1; min-width: 200px; }
+    .footer-label {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 4px;
+    }
+    .footer-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+    .footer-sub { font-size: 13px; color: var(--text-secondary); }
+    .footer-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 20px;
+      background: #1a1a2e;
+      color: #ffffff;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .footer-btn:hover { background: #2d2d50; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .page { padding: 1rem 0.9rem 3rem; }
+      .hero, .section, .footer { padding: 1.25rem 1rem; }
+      .hero-title { font-size: 20px; }
+      .section-header { gap: 9px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-tag">Special Issue — Gendered Mobility</div>
+    <div class="hero-title">Urban transport systems are not gender-neutral</div>
+    <div class="hero-sub">Transport planning has historically centred male 9-to-5 commuting patterns, overlooking the distinct mobility needs, safety concerns, and caregiving realities of women and gender minorities. This summary covers six key dimensions of gendered disparity identified across the research literature.</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-num" style="color:#6b5ea8;">6</div>
+      <div class="stat-label">Key dimensions of gendered disparity</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:#3a8a6a;">16 km</div>
+      <div class="stat-label">Daily walking distance for some informal female workers</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:#c0614a;">2×</div>
+      <div class="stat-label">Compounded risk for transgender &amp; non-binary individuals</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:#4a6fa5;">0</div>
+      <div class="stat-label">Change in men's commute after fatherhood — vs. significant shift for women</div>
+    </div>
+  </div>
+
+  <!-- 01 — Mobility of care -->
+  <div class="section s1">
+    <div class="section-header">
+      <div class="section-icon">🔗</div>
+      <div class="section-meta">
+        <div class="section-number">01</div>
+        <div class="section-title">Mobility of care &amp; household labour</div>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">Trip chaining</div>
+        <div class="card-text">Men make linear home-to-work commutes. Women weave together multiple shorter trips — school drop-off, groceries, errands — around paid work every day.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Time poverty</div>
+        <div class="card-text">Juggling productive and reproductive roles forces many women into part-time work or jobs near home, directly capping wages and career development.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Life-cycle impact</div>
+        <div class="card-text">Having a child significantly shrinks women's commute distances and shifts their travel modes. Men's commuting patterns remain essentially unchanged after becoming fathers.</div>
+      </div>
+    </div>
+    <div class="insight-block"><strong>Key insight:</strong> The mobility burden of caregiving is not a personal choice — it reflects deeply structural inequalities in how household work is divided, with direct consequences for women's economic independence.</div>
+  </div>
+
+  <!-- 02 — Safety & fear -->
+  <div class="section s2">
+    <div class="section-header">
+      <div class="section-icon">⚠️</div>
+      <div class="section-meta">
+        <div class="section-number">02</div>
+        <div class="section-title">Safety, harassment &amp; "female fear"</div>
+      </div>
+    </div>
+    <div class="insight-block" style="margin-bottom:1rem;"><strong>Avoidance behaviours:</strong> High rates of harassment produce hypervigilance. Women regularly alter routes, stop using transit at night, or pay more for private transport to guarantee their safety.</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">Route alteration</div>
+        <div class="card-text">Women frequently choose longer or less direct routes to avoid perceived risk — a hidden "safety tax" on daily mobility.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Mode switching</div>
+        <div class="card-text">Switching from buses to ride-hailing for safety is common, placing a financial burden on women who can least afford it.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Gender minorities</div>
+        <div class="card-text">Transgender and non-binary people face compounded risk: discrimination based on both gender presentation and existing marginalisation. In conservative contexts, public transport can be hostile enough to cause severe social exclusion.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 — Transport modes -->
+  <div class="section s3">
+    <div class="section-header">
+      <div class="section-icon">🚌</div>
+      <div class="section-meta">
+        <div class="section-number">03</div>
+        <div class="section-title">Transport modes &amp; infrastructure</div>
+      </div>
+    </div>
+    <div class="prog-section">
+      <div class="prog-row">
+        <div class="prog-label"><span>Private car access</span><span>Men significantly higher</span></div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:78%; background:#4a6fa5;"></div></div>
+      </div>
+      <div class="prog-row">
+        <div class="prog-label"><span>Public transit reliance</span><span>Women significantly higher</span></div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:70%; background:#3a8a6a;"></div></div>
+      </div>
+      <div class="prog-row">
+        <div class="prog-label"><span>Bicycle &amp; e-scooter use</span><span>Men dominant globally</span></div>
+        <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:82%; background:#a07830;"></div></div>
+      </div>
+      <div class="prog-note">Bars indicate relative male dominance or female reliance — illustrative of research direction, not absolute percentages.</div>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">Captive users</div>
+        <div class="card-text">Lower average incomes mean women depend more heavily on public transit — yet off-peak and peripheral routes, which serve caregiving trips, are systematically underfunded.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Micromobility</div>
+        <div class="card-text">Women cite traffic aggression and poor infrastructure as barriers to cycling. Dense cities with traffic calming (e.g. Barcelona) see much higher female scooter adoption.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Built environment</div>
+        <div class="card-text">Well-lit streets, clean stations, and active shopfronts ("eyes on the street") make women feel safer. Dead-end streets and segregated corridors deter female mobility.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 — Spatial disparities -->
+  <div class="section s4">
+    <div class="section-header">
+      <div class="section-icon">📍</div>
+      <div class="section-meta">
+        <div class="section-number">04</div>
+        <div class="section-title">Spatial &amp; geographical disparities</div>
+      </div>
+    </div>
+    <div class="insight-block" style="margin-bottom:1rem;"><strong>Mobility entropy:</strong> Big data from mobile phones reveals that men visit a wider, more diverse set of locations. Women's activity spaces are smaller, more local, and more predictable.</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">Urban vs. peripheral</div>
+        <div class="card-text">Women in suburban or rural areas face a "double disadvantage" — limited local opportunities combined with poor public transit. When rural roads improve, women disproportionately benefit.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Job-housing imbalance</div>
+        <div class="card-text">Women are far less likely than men to commute long distances due to family responsibilities. Low-income women forced to travel from the periphery carry the heaviest time and physical burdens.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 — Intersectionality -->
+  <div class="section s5">
+    <div class="section-header">
+      <div class="section-icon">⬡</div>
+      <div class="section-meta">
+        <div class="section-number">05</div>
+        <div class="section-title">Intersectionality: income, age &amp; labour</div>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">Income</div>
+        <div class="card-text">Gender disparities widen at lower income levels. Low-income women are trapped in slow, affordable modes. High-income women achieve near-parity through car access.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Generational shift</div>
+        <div class="card-text">Post-COVID data from cities like Madrid shows young women making more trips than young men — a sign of shifting cultural norms and growing female labour participation.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Informal labour</div>
+        <div class="card-text">Female waste pickers in the Global South walk up to 16 km daily pushing heavy carts while managing childcare — their street is simultaneously their workplace and a hostile public space.</div>
+      </div>
+    </div>
+    <div class="insight-block"><strong>Bottom line:</strong> Gender is not the only axis of disadvantage. Class, age, location, and labour type interact to create sharply different experiences of urban mobility.</div>
+  </div>
+
+  <!-- 06 — Gig & leisure -->
+  <div class="section s6">
+    <div class="section-header">
+      <div class="section-icon">🚲</div>
+      <div class="section-meta">
+        <div class="section-number">06</div>
+        <div class="section-title">Gig economy &amp; recreational mobility</div>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-label">Gig drivers</div>
+        <div class="card-text">Female ride-hailing drivers work shorter routes, stay close to home to manage family duties, and avoid night shifts entirely for safety reasons.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Female couriers</div>
+        <div class="card-text">Women couriers demand higher pay to accept cycling and walking assignments — modes they perceive as more physically demanding and less secure.</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Recreational running</div>
+        <div class="card-text">Female runners prefer populated parks and lit paths. Many significantly shorten routes or stop running outdoors altogether after dark due to threat of harassment.</div>
+      </div>
+    </div>
+    <div class="insight-block"><strong>Insight:</strong> Gendered mobility inequality extends beyond commuting into leisure and the gig economy — even time for personal health and recreation is shaped by the threat of violence.</div>
+  </div>
+
+  <!-- Footer — Special Issue link -->
+  <div class="footer">
+    <div class="footer-text">
+      <div class="footer-label">Source</div>
+      <div class="footer-title">Special Issue: Gendered Mobility</div>
+      <div class="footer-sub">Transportation Research — ScienceDirect. Access the full collection of peer-reviewed articles behind this summary.</div>
+    </div>
+    <a class="footer-btn" href="https://www.sciencedirect.com/special-issue/1019D90QVC7" target="_blank" rel="noopener noreferrer">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Read the Special Issue
+    </a>
+  </div>
+
+</div>
+</body>
+</html>
